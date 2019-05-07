@@ -1,4 +1,5 @@
-val sonarScannerVersion = "2.10.0.1189"
+
+lazy val sonarScanner = "org.sonarsource.scanner.api" % "sonar-scanner-api" % "2.12.0.1661"
 
 lazy val `sbt-sonar` = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
@@ -19,13 +20,17 @@ lazy val `sbt-sonar` = (project in file("."))
       "-Ywarn-dead-code"
     ),
 
-    libraryDependencies ++= Seq(
-      "org.sonarsource.scanner.api" % "sonar-scanner-api" % sonarScannerVersion
-    ),
+    libraryDependencies += sonarScanner,
 
     publishMavenStyle := false,
     publishArtifact in Test := false,
 
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, "sonarScannerVersion" -> sonarScannerVersion),
+    buildInfoKeys := Seq[BuildInfoKey](
+      name,
+      version,
+      scalaVersion,
+      sbtVersion,
+      "sonarScannerVersion" -> sonarScanner.revision
+    ),
     buildInfoPackage := "sbtsonar"
   )

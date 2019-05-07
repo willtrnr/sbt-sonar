@@ -94,7 +94,8 @@ object SonarPlugin extends AutoPlugin {
     sonar := sonarTask.value
   )
 
-  private[this] def rel(base: File, file: File): String = IO.relativize(base, file).getOrElse(file.toString)
+  private[this] def rel(base: File, file: File): String =
+    IO.relativize(base, file).getOrElse(file.toString)
 
   case class SonarModuleConfig(
     name: String,
