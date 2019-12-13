@@ -1,5 +1,5 @@
 
-lazy val sonarScanner = "org.sonarsource.scanner.api" % "sonar-scanner-api" % "2.12.0.1661"
+lazy val sonarScanner = "org.sonarsource.scanner.api" % "sonar-scanner-api" % "2.14.0.2002"
 
 lazy val `sbt-sonar` = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
