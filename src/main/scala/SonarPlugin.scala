@@ -51,7 +51,7 @@ object SonarPlugin extends AutoPlugin {
   import autoImport._
 
   def sonarDefaultSettings: Seq[Def.Setting[_]] = Seq(
-    sonarHostUrl := url("http://localhost:9000"),
+    sonarHostUrl := url(sys.env.getOrElse("SONAR_HOST_URL", "http://localhost:9000")),
 
     sonarProjectKey := organization.value,
     sonarProjectName := name.value,
