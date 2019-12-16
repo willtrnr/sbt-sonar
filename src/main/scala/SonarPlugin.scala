@@ -32,7 +32,9 @@ object SonarKeys {
   val sonarJavaTestBinaries = settingKey[File]("Sonar Java test class directory")
   val sonarJavaTestLibraries = taskKey[Classpath]("Sonar Java test libraries")
 
-  val sonarJacocoReportPaths = settingKey[Seq[File]]("Sonar Jacoco .exec report paths")
+  val sonarJacocoReportPaths = settingKey[Seq[File]]("Sonar Jacoco XML report paths")
+  val sonarScoverageReportPaths = settingKey[Seq[File]]("Sonar Scoverage report paths")
+  val sonarScapegoatReportPaths = settingKey[Seq[File]]("Sonar Scapegoat Scalastyle report paths")
 
   val sonarConfig = taskKey[Map[String, String]]("Sonar project full configuration")
   val generateSonarConfig = taskKey[Unit]("Generate the Sonar project configuration")
@@ -73,7 +75,7 @@ object SonarPlugin extends AutoPlugin {
       javacOptions.value
         .sliding(2)
         .collectFirst { case Seq("-source", v) => v }
-        .getOrElse("7")
+        .getOrElse("8")
     },
 
     sonarJavaBinaries := (classDirectory in Compile).value,
@@ -82,7 +84,9 @@ object SonarPlugin extends AutoPlugin {
     sonarJavaTestBinaries := (classDirectory in Test).value,
     sonarJavaTestLibraries := (dependencyClasspath in Test).value,
 
-    sonarJacocoReportPaths := Seq(crossTarget.value / "jacoco" / "data" / "jacoco.exec"),
+    sonarJacocoReportPaths := Seq(crossTarget.value / "jacoco" / "report" / "jacoco.xml"),
+    sonarScoverageReportPaths := Seq(crossTarget.value / "scoverage-report" / "scoverage.xml"),
+    sonarScapegoatReportPaths := Seq(crossTarget.value / "scapegoat-report" / "scapegoat-scalastyle.xml"),
 
     aggregate in sonarConfig := false,
     sonarConfig := sonarConfigTask.value,
@@ -106,20 +110,27 @@ object SonarPlugin extends AutoPlugin {
     testSources: Seq[File],
     testBinaries: File,
     testLibraries: Classpath,
-    jacocoReports: Seq[File]
+    jacocoReports: Seq[File],
+    scoverageReports: Seq[File],
+    scapegoatReports: Seq[File]
   )
 
   def generateModuleConfig(config: SonarModuleConfig, prefix: String = "", parent: Option[File] = None): Map[String, String] = {
     import Attributed._
     Map(
       (prefix + "sonar.projectBaseDir") -> parent.fold(config.base.getAbsolutePath)(p => rel(p, config.base)),
+
       (prefix + "sonar.sources") -> config.sources.filter(_.exists).map(rel(config.base, _)).mkString(","),
       (prefix + "sonar.java.binaries") -> rel(config.base, config.binaries),
       (prefix + "sonar.java.libraries") -> data(config.libraries).map(rel(config.base, _)).mkString(","),
+
       (prefix + "sonar.tests") -> config.testSources.filter(_.exists).map(rel(config.base, _)).mkString(","),
       (prefix + "sonar.java.test.binaries") -> rel(config.base, config.testBinaries),
       (prefix + "sonar.java.test.libraries") -> data(config.testLibraries).map(rel(config.base, _)).mkString(","),
-      (prefix + "sonar.jacoco.reportPaths") -> config.jacocoReports.filter(_.exists).map(rel(config.base, _)).mkString(",")
+
+      (prefix + "sonar.coverage.jacoco.xmlReportPaths") -> config.jacocoReports.filter(_.exists).map(rel(config.base, _)).mkString(","),
+      (prefix + "sonar.scala.coverage.reportPaths") -> config.scoverageReports.filter(_.exists).map(rel(config.base, _)).mkString(","),
+      (prefix + "sonar.scala.scapegoat.reportPaths") -> config.scapegoatReports.filter(_.exists).map(rel(config.base, _)).mkString(",")
     )
   }
 
@@ -133,7 +144,9 @@ object SonarPlugin extends AutoPlugin {
       sonarTests.value,
       sonarJavaTestBinaries.value,
       sonarJavaTestLibraries.value,
-      sonarJacocoReportPaths.value
+      sonarJacocoReportPaths.value,
+      sonarScoverageReportPaths.value,
+      sonarScapegoatReportPaths.value
     )
   }
 

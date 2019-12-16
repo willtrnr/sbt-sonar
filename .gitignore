@@ -1,10 +1,12 @@
 *.sublime-*
 *~
 .*.swp
+.bloop/
 .ensime*
 .env
-.idea
-.ivy2
+.idea/
+.ivy2/
+.metals/
 .sbtopts
 .scannerwork/
 .~*
