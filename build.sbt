@@ -1,3 +1,4 @@
+import ReleaseTransformations._
 
 lazy val sonarScanner = "org.sonarsource.scanner.api" % "sonar-scanner-api" % "2.14.0.2002"
 
@@ -10,6 +11,7 @@ lazy val `sbt-sonar` = (project in file("."))
     licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.php")),
 
     sbtPlugin := true,
+    crossSbtVersions := Seq("1.2.8", "0.13.18"),
 
     scalacOptions ++= Seq(
       "-unchecked",
@@ -32,5 +34,22 @@ lazy val `sbt-sonar` = (project in file("."))
       sbtVersion,
       "sonarScannerVersion" -> sonarScanner.revision
     ),
-    buildInfoPackage := "sbtsonar"
+
+    buildInfoPackage := "sbtsonar",
+
+    releaseCrossBuild := false,
+
+    releaseProcess := Seq(
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      releaseStepCommandAndRemaining("^test"),
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      releaseStepCommandAndRemaining("^publish"),
+      setNextVersion,
+      commitNextVersion,
+      pushChanges,
+    ),
   )
