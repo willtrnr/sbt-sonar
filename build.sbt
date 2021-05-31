@@ -5,10 +5,23 @@ lazy val sonarScanner = "org.sonarsource.scanner.api" % "sonar-scanner-api" % "2
 lazy val `sbt-sonar` = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .settings(
-    name := "sbt-sonar",
     organization := "net.archwill.sbt",
+    version := (version in ThisBuild).value,
 
-    licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.php")),
+    name := "sbt-sonar",
+    description := "Sonar Scanner plugin for sbt",
+
+    homepage := Some(url("https://github.com/willtrnr/sbt-sonar")),
+
+    licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT"))),
+
+    scmInfo := Some(ScmInfo(
+      url("https://github.com/willtrnr/sbt-sonar"),
+      "scm:git:https://github.com/willtrnr/sbt-sonar.git",
+      "scm:git:ssh://git@github.com/willtrnr/sbt-sonar.git"
+    )),
+
+    publishTo := Some("GitHub" at "https://maven.pkg.github.com/willtrnr/maven-repo"),
 
     sbtPlugin := true,
     crossSbtVersions := Seq("1.2.8", "0.13.18"),
@@ -24,7 +37,7 @@ lazy val `sbt-sonar` = (project in file("."))
 
     libraryDependencies += sonarScanner,
 
-    publishMavenStyle := false,
+    publishMavenStyle := true,
     publishArtifact in Test := false,
 
     buildInfoKeys := Seq[BuildInfoKey](
